@@ -1,17 +1,17 @@
-# @eelzap/delivery-sdk
+# @8ux-co/eelzap-api-sdk-ts
 
 Official TypeScript client for the EelZap Content Delivery API.
 
 ## Installation
 
 ```bash
-npm install @eelzap/delivery-sdk
+npm install @8ux-co/eelzap-api-sdk-ts
 ```
 
 ## Quick Start
 
 ```ts
-import { createClient } from '@eelzap/delivery-sdk';
+import { createClient } from '@8ux-co/eelzap-api-sdk-ts';
 
 const cms = createClient({
   apiKey: process.env.EELZAP_API_KEY!,
@@ -95,7 +95,7 @@ const homepage = await cms.documents.get('homepage', {
 
 ```ts
 // lib/cms.ts
-import { createClient } from '@eelzap/delivery-sdk';
+import { createClient } from '@8ux-co/eelzap-api-sdk-ts';
 
 export const cms = createClient({
   apiKey: process.env.EELZAP_API_KEY!,
@@ -118,7 +118,7 @@ export default async function BlogPage() {
 ## Error Handling
 
 ```ts
-import { isEelZapError } from '@eelzap/delivery-sdk';
+import { isEelZapError } from '@8ux-co/eelzap-api-sdk-ts';
 
 try {
   await cms.items.get('blog-posts', 'missing-post');
