@@ -39,5 +39,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
+          enable_jekyll: false
           force_orphan: true
           commit_message: "docs: publish generated TypeDoc output"
