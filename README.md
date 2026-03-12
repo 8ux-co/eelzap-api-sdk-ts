@@ -158,6 +158,10 @@ Generate docs locally with:
 npm run docs
 ```
 
+Live API docs:
+
+<https://8ux-dev.github.io/eelzap-api-sdk-ts/>
+
 The published documentation is deployed from the `gh-pages` branch by CI.
 That branch is generated output only:
 
