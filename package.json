@@ -5,11 +5,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/8ux-dev/eelzap-api-sdk-ts"
+    "url": "https://github.com/8ux-co/eelzap-api-sdk-ts"
   },
-  "homepage": "https://github.com/8ux-dev/eelzap-api-sdk-ts#readme",
+  "homepage": "https://github.com/8ux-co/eelzap-api-sdk-ts#readme",
   "bugs": {
-    "url": "https://github.com/8ux-dev/eelzap-api-sdk-ts/issues"
+    "url": "https://github.com/8ux-co/eelzap-api-sdk-ts/issues"
   },
   "type": "module",
   "main": "./dist/index.cjs",
