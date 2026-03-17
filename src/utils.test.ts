@@ -64,7 +64,7 @@ describe('utils', () => {
 
   it('masks short and long api keys', () => {
     expect(maskApiKey('short')).toBe('***');
-    expect(maskApiKey('cms_secret_12345678')).toBe('cms_...5678');
+    expect(maskApiKey('secret_12345678')).toBe('secr...5678');
   });
 
   it('normalizes optional header values', () => {

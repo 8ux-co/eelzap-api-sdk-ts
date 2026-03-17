@@ -16,7 +16,7 @@ describe('HttpClient', () => {
   it('sends auth headers and query params through get', async () => {
     const fetchMock = vi.fn().mockResolvedValueOnce(createResponse({ ok: true }));
     const client = new HttpClient({
-      apiKey: 'cms_secret_1234',
+      apiKey: 'secret_1234',
       baseUrl: 'https://api.eelzap.com/',
       pathPrefix: '/v1',
       fetch: fetchMock,
@@ -38,7 +38,7 @@ describe('HttpClient', () => {
     const headers = Object.fromEntries(new Headers(init.headers).entries());
     expect(url).toBe('https://api.eelzap.com/v1/collections?status=published&page=2');
     expect(headers).toMatchObject({
-      authorization: 'Bearer cms_secret_1234',
+      authorization: 'Bearer secret_1234',
       'x-test': '1',
     });
     expect(init.method).toBe('GET');
@@ -58,7 +58,7 @@ describe('HttpClient', () => {
       ),
     );
     const client = new HttpClient({
-      apiKey: 'cms_secret_1234',
+      apiKey: 'secret_1234',
       baseUrl: 'https://api.eelzap.com/',
       pathPrefix: '/api/public/v1',
       fetch: fetchMock,
@@ -75,7 +75,7 @@ describe('HttpClient', () => {
   it('wraps transport failures as network errors', async () => {
     const fetchMock = vi.fn().mockRejectedValueOnce(new Error('socket closed'));
     const client = new HttpClient({
-      apiKey: 'cms_secret_1234',
+      apiKey: 'secret_1234',
       baseUrl: 'https://api.eelzap.com/',
       pathPrefix: '/api/public/v1',
       fetch: fetchMock,
@@ -102,7 +102,7 @@ describe('HttpClient', () => {
         }),
       );
     const client = new HttpClient({
-      apiKey: 'cms_secret_1234',
+      apiKey: 'secret_1234',
       baseUrl: 'https://api.eelzap.com/',
       pathPrefix: '/api/public/v1',
       fetch: fetchMock,
@@ -130,7 +130,7 @@ describe('HttpClient', () => {
         ),
       );
     const client = new HttpClient({
-      apiKey: 'cms_secret_1234',
+      apiKey: 'secret_1234',
       baseUrl: 'https://api.eelzap.com/',
       pathPrefix: '/api/public/v1',
       fetch: fetchMock,
@@ -156,7 +156,7 @@ describe('HttpClient', () => {
       });
     });
     const client = new HttpClient({
-      apiKey: 'cms_secret_1234',
+      apiKey: 'secret_1234',
       baseUrl: 'https://api.eelzap.com/',
       pathPrefix: '/api/public/v1',
       fetch: fetchMock as typeof fetch,
@@ -192,7 +192,7 @@ describe('HttpClient', () => {
         }),
       );
     const client = new HttpClient({
-      apiKey: 'cms_secret_1234',
+      apiKey: 'secret_1234',
       baseUrl: 'https://api.eelzap.com/',
       pathPrefix: '/api/public/v1',
       fetch: fetchMock,
@@ -220,7 +220,7 @@ describe('HttpClient', () => {
       .mockResolvedValueOnce(new Response(null, { status: 200 }));
 
     const client = new HttpClient({
-      apiKey: 'cms_secret_1234',
+      apiKey: 'secret_1234',
       baseUrl: 'https://api.eelzap.com/',
       pathPrefix: '/v1',
       fetch: fetchMock,
@@ -273,7 +273,7 @@ describe('HttpClient', () => {
       );
 
     const client = new HttpClient({
-      apiKey: 'cms_secret_1234',
+      apiKey: 'secret_1234',
       baseUrl: 'https://api.eelzap.com/',
       pathPrefix: '/',
       fetch: fetchMock,
@@ -299,7 +299,7 @@ describe('HttpClient', () => {
       .mockResolvedValueOnce(createResponse({ ok: true }));
 
     const client = new HttpClient({
-      apiKey: 'cms_secret_1234',
+      apiKey: 'secret_1234',
       baseUrl: 'https://api.eelzap.com/',
       pathPrefix: '/v1',
       fetch: fetchMock,
@@ -346,7 +346,7 @@ describe('HttpClient', () => {
       .mockImplementationOnce(() => Promise.reject(new Error('boom')));
 
     const client = new HttpClient({
-      apiKey: 'cms_secret_1234',
+      apiKey: 'secret_1234',
       baseUrl: 'https://api.eelzap.com/',
       pathPrefix: '/v1',
       fetch: fetchMock as typeof fetch,

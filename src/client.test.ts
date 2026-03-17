@@ -5,7 +5,7 @@ import { EelZapClient, createClient } from './client';
 describe('EelZapClient', () => {
   it('creates a client through the factory', () => {
     const client = createClient({
-      apiKey: 'cms_secret_12345678',
+      apiKey: 'secret_12345678',
       fetch: vi.fn(),
     });
 
@@ -26,15 +26,15 @@ describe('EelZapClient', () => {
 
   it('masks the API key in string output', () => {
     const client = new EelZapClient({
-      apiKey: 'cms_secret_12345678',
+      apiKey: 'secret_12345678',
       baseUrl: 'https://api.eelzap.com',
       pathPrefix: '/api/public/v1',
       fetch: vi.fn(),
     });
 
     expect(client.toString()).toContain('pathPrefix=/api/public/v1');
-    expect(client.toString()).toContain('cms_...5678');
-    expect(client.toString()).not.toContain('cms_secret_12345678');
+    expect(client.toString()).toContain('secr...5678');
+    expect(client.toString()).not.toContain('secret_12345678');
   });
 
   it('requires an API key', () => {
@@ -55,7 +55,7 @@ describe('EelZapClient', () => {
       expect(
         () =>
           new EelZapClient({
-            apiKey: 'cms_secret_12345678',
+            apiKey: 'secret_12345678',
           }),
       ).toThrow('A fetch implementation is required.');
     } finally {

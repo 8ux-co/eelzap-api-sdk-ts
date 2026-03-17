@@ -25,7 +25,7 @@ describe('index exports', () => {
 
   it('creates a client from the barrel export', () => {
     const client = sdk.createClient({
-      apiKey: 'cms_secret_12345678',
+      apiKey: 'secret_12345678',
       fetch: vi.fn(),
     });
 
