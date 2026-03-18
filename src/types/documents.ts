@@ -66,6 +66,7 @@ export interface CreateDocumentInput {
  */
 export interface UpdateDocumentInput {
   name?: string;
+  key?: string;
   description?: string | null;
 }
 

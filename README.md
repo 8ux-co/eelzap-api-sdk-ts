@@ -113,6 +113,12 @@ const homepage = await cms.documents.get('homepage', {
   status: 'draft',
 });
 
+await cms.documents.update('homepage', {
+  name: 'Homepage',
+  key: 'homepage-v2',
+  description: 'The main landing page',
+});
+
 await cms.documents.values.update('homepage', {
   hero_title: 'Welcome',
 });
