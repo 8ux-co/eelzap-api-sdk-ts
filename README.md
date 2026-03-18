@@ -182,6 +182,99 @@ export default async function BlogPage() {
 }
 ```
 
+## Resilience & Caching
+
+The SDK ships a `cachedFetch` helper and a `CacheAdapter` interface for
+**last-known-good caching** — no hardcoded fallback strings required.
+
+On every successful fetch the result is persisted to your adapter. If a
+subsequent fetch fails (network error, timeout, 5xx), the last cached
+value is returned automatically. If nothing has ever been cached, the
+original error is re-thrown so your app can handle it explicitly.
+
+### Quick example
+
+```ts
+import {
+  createClient,
+  cachedFetch,
+  MemoryCacheAdapter,
+} from '@8ux-co/eelzap-api-sdk-ts';
+
+const cms = createClient({ apiKey: process.env.EELZAP_API_KEY! });
+const cache = new MemoryCacheAdapter();
+
+// First successful call populates the cache.
+// Subsequent failures transparently serve the last-known-good value.
+const homepage = await cachedFetch(
+  'homepage',
+  () => cms.documents.get('homepage'),
+  cache,
+);
+
+const { data: posts } = await cachedFetch(
+  'blog:page-1',
+  () => cms.items.list('blog-posts', { pageSize: 10 }),
+  cache,
+);
+```
+
+### Custom cache adapters
+
+`MemoryCacheAdapter` works for long-lived servers but data is lost on
+restart. Implement the `CacheAdapter` interface to persist to any
+backend:
+
+```ts
+import type { CacheAdapter } from '@8ux-co/eelzap-api-sdk-ts';
+
+// Example: filesystem adapter (Node.js)
+class FsCacheAdapter implements CacheAdapter {
+  #dir: string;
+  constructor(dir: string) { this.#dir = dir; }
+
+  async get<T>(key: string): Promise<T | undefined> {
+    try {
+      const raw = await fs.readFile(path.join(this.#dir, `${key}.json`), 'utf8');
+      return JSON.parse(raw) as T;
+    } catch { return undefined; }
+  }
+
+  async set<T>(key: string, value: T): Promise<void> {
+    await fs.mkdir(this.#dir, { recursive: true });
+    await fs.writeFile(
+      path.join(this.#dir, `${key}.json`),
+      JSON.stringify(value),
+    );
+  }
+}
+```
+
+Other backends that work well: Vercel KV, Cloudflare KV, Redis,
+IndexedDB (for client-side apps), or your framework's built-in cache.
+
+### Recommendations
+
+| Scenario | Recommended adapter | Notes |
+| --- | --- | --- |
+| Long-running server (Express, Fastify) | `MemoryCacheAdapter` | Fast, no I/O; lost on restart |
+| Serverless (Lambda, Vercel Functions) | File system or KV store | Memory is discarded between invocations |
+| Edge (Cloudflare Workers) | KV or Durable Objects | Workers have no filesystem |
+| Static builds (Astro, Gatsby) | Not needed | Content is fetched at build time |
+| Client-side SPA | IndexedDB or localStorage adapter | Survives page reloads |
+
+### Why not hardcoded fallbacks?
+
+Hardcoded default strings go stale immediately and create a maintenance
+burden. With `cachedFetch`, your site always serves real CMS content:
+
+- **First deploy:** content is fetched fresh and cached.
+- **CMS goes down:** last-known-good content is served seamlessly.
+- **CMS recovers:** the cache is silently refreshed on the next request.
+- **Content never fetched:** the error propagates — you decide how to
+  handle it (error page, skeleton, etc.) rather than showing stale
+  placeholder text.
+
 ## Error Handling
 
 ```ts

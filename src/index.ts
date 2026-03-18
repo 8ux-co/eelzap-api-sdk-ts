@@ -1,3 +1,5 @@
+export { cachedFetch, MemoryCacheAdapter } from './cache';
+export type { CacheAdapter } from './cache';
 export { createClient, EelZapClient } from './client';
 export type { ClientConfig } from './client';
 export { EelZapError, EelZapNetworkError, isEelZapError } from './errors';
