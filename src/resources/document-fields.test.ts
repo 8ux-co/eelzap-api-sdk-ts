@@ -34,4 +34,40 @@ describe('DocumentFieldsResource', () => {
       fieldIds: ['field_1'],
     });
   });
+
+  it('passes multi-currency constraints through unchanged', async () => {
+    const post = vi.fn().mockResolvedValue({ field: { id: 'field_price' } });
+    const patch = vi.fn().mockResolvedValue({ field: { id: 'field_price' } });
+    const http = { post, patch } as unknown as HttpClient;
+    const resource = new DocumentFieldsResource(http);
+
+    await resource.create('pricing-page', {
+      key: 'price',
+      label: 'Price',
+      type: 'CURRENCY',
+      constraints: {
+        currencies: ['USD', 'EUR'],
+      },
+    });
+
+    await resource.update('pricing-page', 'field_price', {
+      constraints: {
+        currencies: ['USD', 'EUR', 'COP'],
+      },
+    });
+
+    expect(post).toHaveBeenCalledWith('/documents/pricing-page/fields', {
+      key: 'price',
+      label: 'Price',
+      type: 'CURRENCY',
+      constraints: {
+        currencies: ['USD', 'EUR'],
+      },
+    });
+    expect(patch).toHaveBeenCalledWith('/documents/pricing-page/fields/field_price', {
+      constraints: {
+        currencies: ['USD', 'EUR', 'COP'],
+      },
+    });
+  });
 });

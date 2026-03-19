@@ -36,4 +36,40 @@ describe('CollectionFieldsResource', () => {
     });
     expect(put).toHaveBeenCalledWith('/collections/blog/fields/reorder', { fieldIds: ['field_1'] });
   });
+
+  it('passes multi-currency constraints through unchanged', async () => {
+    const post = vi.fn().mockResolvedValue({ field: { id: 'field_price' } });
+    const patch = vi.fn().mockResolvedValue({ field: { id: 'field_price' } });
+    const http = { post, patch } as unknown as HttpClient;
+    const resource = new CollectionFieldsResource(http);
+
+    await resource.create('properties', {
+      key: 'price',
+      label: 'Price',
+      type: 'CURRENCY',
+      constraints: {
+        currencies: ['USD', 'EUR', 'COP'],
+      },
+    });
+
+    await resource.update('properties', 'field_price', {
+      constraints: {
+        currencies: ['USD', 'COP'],
+      },
+    });
+
+    expect(post).toHaveBeenCalledWith('/collections/properties/fields', {
+      key: 'price',
+      label: 'Price',
+      type: 'CURRENCY',
+      constraints: {
+        currencies: ['USD', 'EUR', 'COP'],
+      },
+    });
+    expect(patch).toHaveBeenCalledWith('/collections/properties/fields/field_price', {
+      constraints: {
+        currencies: ['USD', 'COP'],
+      },
+    });
+  });
 });

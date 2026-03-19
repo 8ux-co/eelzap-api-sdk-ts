@@ -29,6 +29,19 @@ export interface FieldOptionInput {
 }
 
 /**
+ * Shared field constraints returned by the management API.
+ */
+export interface FieldConstraints {
+  min?: number;
+  max?: number;
+  minLength?: number;
+  maxLength?: number;
+  regex?: string;
+  currencies?: string[];
+  [key: string]: unknown;
+}
+
+/**
  * Collection field schema information.
  */
 export interface FieldInfo {
@@ -47,7 +60,7 @@ export interface FieldInfo {
   galleryMinItems?: number | null;
   galleryMaxItems?: number | null;
   galleryAllowedTypes?: 'IMAGE' | 'VIDEO' | 'IMAGE,VIDEO' | null;
-  constraints?: Record<string, unknown> | null;
+  constraints?: FieldConstraints | null;
   options?: EnumValue[];
 }
 
@@ -126,7 +139,7 @@ export interface CreateFieldInput {
   galleryMaxItems?: number | null;
   galleryAllowedTypes?: 'IMAGE' | 'VIDEO' | 'IMAGE,VIDEO' | null;
   description?: string | null;
-  constraints?: Record<string, unknown> | null;
+  constraints?: FieldConstraints | null;
   defaultValue?: string | null;
   sectionId?: string | null;
   options?: FieldOptionInput[] | null;
@@ -147,7 +160,7 @@ export interface UpdateFieldInput {
   galleryMaxItems?: number | null;
   galleryAllowedTypes?: 'IMAGE' | 'VIDEO' | 'IMAGE,VIDEO' | null;
   description?: string | null;
-  constraints?: Record<string, unknown> | null;
+  constraints?: FieldConstraints | null;
   defaultValue?: string | null;
   sectionId?: string | null;
   options?: FieldOptionInput[] | null;
