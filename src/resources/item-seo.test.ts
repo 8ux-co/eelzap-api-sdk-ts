@@ -8,13 +8,13 @@ describe('ItemSeoResource', () => {
     const get = vi.fn().mockResolvedValue({
       seo: {
         metaTitle: 'Hello',
-        structuredData: [{ '@context': 'https://schema.org' }],
+        structuredData: { '@context': 'https://schema.org' },
       },
     });
     const patch = vi.fn().mockResolvedValue({
       seo: {
         metaTitle: 'Updated',
-        structuredData: [{ '@type': 'Article' }],
+        structuredData: { '@type': 'Article' },
       },
     });
     const http = { get, patch } as unknown as HttpClient;
@@ -22,16 +22,16 @@ describe('ItemSeoResource', () => {
 
     await expect(resource.get('blog', 'hello-world', { locale: 'en' })).resolves.toEqual({
       metaTitle: 'Hello',
-      structuredData: [{ '@context': 'https://schema.org' }],
+      structuredData: { '@context': 'https://schema.org' },
     });
     await expect(
       resource.update('blog', 'hello-world', {
         metaTitle: 'Updated',
-        structuredData: [{ '@type': 'Article' }],
+        structuredData: { '@type': 'Article' },
       }),
     ).resolves.toEqual({
       metaTitle: 'Updated',
-      structuredData: [{ '@type': 'Article' }],
+      structuredData: { '@type': 'Article' },
     });
 
     expect(get).toHaveBeenCalledWith('/collections/blog/items/hello-world/seo', {
@@ -39,7 +39,7 @@ describe('ItemSeoResource', () => {
     });
     expect(patch).toHaveBeenCalledWith('/collections/blog/items/hello-world/seo', {
       metaTitle: 'Updated',
-      structuredData: [{ '@type': 'Article' }],
+      structuredData: { '@type': 'Article' },
     });
   });
 });

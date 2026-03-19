@@ -8,13 +8,13 @@ describe('DocumentSeoResource', () => {
     const get = vi.fn().mockResolvedValue({
       seo: {
         metaTitle: 'Homepage',
-        structuredData: [{ '@context': 'https://schema.org' }],
+        structuredData: { '@context': 'https://schema.org' },
       },
     });
     const put = vi.fn().mockResolvedValue({
       seo: {
         metaTitle: 'Updated',
-        structuredData: [{ '@type': 'WebPage' }],
+        structuredData: { '@type': 'WebPage' },
       },
     });
     const http = { get, put } as unknown as HttpClient;
@@ -22,21 +22,21 @@ describe('DocumentSeoResource', () => {
 
     await expect(resource.get('homepage', { locale: '*' })).resolves.toEqual({
       metaTitle: 'Homepage',
-      structuredData: [{ '@context': 'https://schema.org' }],
+      structuredData: { '@context': 'https://schema.org' },
     });
     await expect(
       resource.update('homepage', {
         metaTitle: 'Updated',
-        structuredData: [{ '@type': 'WebPage' }],
+        structuredData: { '@type': 'WebPage' },
       }),
     ).resolves.toEqual({
       metaTitle: 'Updated',
-      structuredData: [{ '@type': 'WebPage' }],
+      structuredData: { '@type': 'WebPage' },
     });
 
     expect(put).toHaveBeenCalledWith('/documents/homepage/seo', {
       metaTitle: 'Updated',
-      structuredData: [{ '@type': 'WebPage' }],
+      structuredData: { '@type': 'WebPage' },
     });
   });
 });
