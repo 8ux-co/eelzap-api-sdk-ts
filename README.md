@@ -124,6 +124,11 @@ await cms.documents.values.update('homepage', {
 });
 await cms.documents.seo.update('homepage', {
   metaTitle: 'Homepage',
+  structuredData: {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Homepage',
+  },
 });
 ```
 

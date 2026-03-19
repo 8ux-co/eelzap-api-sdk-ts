@@ -19,6 +19,17 @@ export interface Pagination {
 }
 
 /**
+ * JSON value accepted by SEO structured data fields.
+ */
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue };
+
+/**
  * Site metadata resolved from the authenticated API key.
  */
 export interface SiteInfo {
@@ -42,7 +53,7 @@ export interface Seo {
   noIndex: boolean;
   noFollow: boolean;
   keywords: string | null;
-  structuredData: Record<string, unknown> | null;
+  structuredData: JsonValue;
 }
 
 /**
@@ -161,7 +172,7 @@ export interface SeoInput {
   noIndex?: boolean;
   noFollow?: boolean;
   keywords?: string | null;
-  structuredData?: Record<string, unknown> | null;
+  structuredData?: JsonValue;
   locale?: string | null;
 }
 
