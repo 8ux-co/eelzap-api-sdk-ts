@@ -1,6 +1,6 @@
 {
   "name": "@8ux-co/eelzap-api-sdk-ts",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Official TypeScript client for the EelZap Content Delivery API.",
   "license": "MIT",
   "repository": {
@@ -11,10 +11,21 @@
   "bugs": {
     "url": "https://github.com/8ux-co/eelzap-api-sdk-ts/issues"
   },
+  "keywords": [
+    "eelzap",
+    "cms",
+    "typescript",
+    "sdk",
+    "delivery",
+    "codegen"
+  ],
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "eelzap-codegen": "dist/cli.js"
+  },
   "exports": {
     ".": {
       "import": {
@@ -24,6 +35,16 @@
       "require": {
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
+      }
+    },
+    "./codegen": {
+      "import": {
+        "types": "./dist/codegen.d.ts",
+        "default": "./dist/codegen.js"
+      },
+      "require": {
+        "types": "./dist/codegen.d.cts",
+        "default": "./dist/codegen.cjs"
       }
     }
   },
@@ -69,5 +90,9 @@
     "typedoc-plugin-markdown": "^4.9.0",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^7.10.1",
+    "dotenv": "^16.6.1"
   }
 }
