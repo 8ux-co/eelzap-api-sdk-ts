@@ -1,19 +1,22 @@
 import type { FieldInfo, FieldType } from '../types/collections';
 
-export const FIELD_TYPE_MAP: Record<Exclude<FieldType, string & {}>, string> = {
+export const FIELD_TYPE_MAP: Record<FieldType, string> = {
   SHORT_TEXT: 'string',
   LONG_TEXT: 'string',
   RICH_TEXT: 'string',
   NUMBER: 'number',
+  INTEGER: 'number',
   BOOLEAN: 'boolean',
   DATE: 'string',
   DATETIME: 'string',
   ENUM: 'string',
-  MEDIA: 'MediaValue',
   CURRENCY: 'CurrencyValue',
-  COLOR: 'string',
-  URL: 'string',
   GALLERY: 'GalleryItemValue[]',
+  IMAGE: 'MediaValue',
+  VIDEO: 'MediaValue',
+  FILE: 'MediaValue',
+  URL: 'string',
+  EMAIL: 'string',
 };
 
 export function mapFieldToTypeScript(field: FieldInfo): string {
@@ -34,9 +37,15 @@ export function mapFieldBaseType(field: FieldInfo): string {
 }
 
 export function fieldUsesSdkType(field: FieldInfo): field is FieldInfo & {
-  type: 'MEDIA' | 'CURRENCY' | 'GALLERY';
+  type: 'IMAGE' | 'VIDEO' | 'FILE' | 'CURRENCY' | 'GALLERY';
 } {
-  return field.type === 'MEDIA' || field.type === 'CURRENCY' || field.type === 'GALLERY';
+  return (
+    field.type === 'IMAGE' ||
+    field.type === 'VIDEO' ||
+    field.type === 'FILE' ||
+    field.type === 'CURRENCY' ||
+    field.type === 'GALLERY'
+  );
 }
 
 export function mapEnumFieldType(field: Pick<FieldInfo, 'options'>): string {

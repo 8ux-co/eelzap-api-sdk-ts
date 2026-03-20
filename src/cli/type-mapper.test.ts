@@ -19,14 +19,17 @@ describe('mapFieldBaseType', () => {
     ['LONG_TEXT', 'string'],
     ['RICH_TEXT', 'string'],
     ['NUMBER', 'number'],
+    ['INTEGER', 'number'],
     ['BOOLEAN', 'boolean'],
     ['DATE', 'string'],
     ['DATETIME', 'string'],
-    ['MEDIA', 'MediaValue'],
     ['CURRENCY', 'CurrencyValue'],
-    ['COLOR', 'string'],
-    ['URL', 'string'],
     ['GALLERY', 'GalleryItemValue[]'],
+    ['IMAGE', 'MediaValue'],
+    ['VIDEO', 'MediaValue'],
+    ['FILE', 'MediaValue'],
+    ['URL', 'string'],
+    ['EMAIL', 'string'],
   ] satisfies Array<[FieldType, string]>)('maps %s to %s', (type, expected) => {
     expect(mapFieldBaseType(createField(type))).toBe(expected);
   });
@@ -49,7 +52,7 @@ describe('mapFieldBaseType', () => {
   });
 
   it('falls back to unknown for unsupported field types', () => {
-    expect(mapFieldBaseType(createField('UNSUPPORTED_TYPE'))).toBe('unknown');
+    expect(mapFieldBaseType(createField('UNSUPPORTED_TYPE' as FieldType))).toBe('unknown');
   });
 });
 

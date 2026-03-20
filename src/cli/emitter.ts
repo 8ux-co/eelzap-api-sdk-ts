@@ -254,7 +254,9 @@ function buildWrappedType(
 function collectSdkImports(entity: EntitySchema, options: EmitterOptions): string[] {
   const imports = new Set<string>();
   const sdkImportsByFieldType = {
-    MEDIA: 'MediaValue',
+    IMAGE: 'MediaValue',
+    VIDEO: 'MediaValue',
+    FILE: 'MediaValue',
     CURRENCY: 'CurrencyValue',
     GALLERY: 'GalleryItemValue',
   } as const;

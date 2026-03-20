@@ -43,7 +43,7 @@ describe('generateTypes', () => {
                   {
                     key: 'hero_image',
                     label: 'Hero image',
-                    type: 'MEDIA',
+                    type: 'IMAGE',
                     isLocalized: false,
                   },
                 ],

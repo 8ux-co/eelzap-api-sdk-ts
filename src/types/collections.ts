@@ -1,23 +1,25 @@
 import type { EnumValue } from './common';
 
 /**
- * Field types supported by the public management API.
+ * Canonical field types for the Delivery API.
  */
 export type FieldType =
   | 'SHORT_TEXT'
   | 'LONG_TEXT'
   | 'RICH_TEXT'
   | 'NUMBER'
+  | 'INTEGER'
   | 'BOOLEAN'
   | 'DATE'
   | 'DATETIME'
   | 'ENUM'
-  | 'MEDIA'
   | 'CURRENCY'
-  | 'COLOR'
-  | 'URL'
   | 'GALLERY'
-  | (string & {});
+  | 'IMAGE'
+  | 'VIDEO'
+  | 'FILE'
+  | 'URL'
+  | 'EMAIL';
 
 /**
  * Enum option payload for field creation and updates.
