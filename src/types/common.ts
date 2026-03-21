@@ -186,7 +186,7 @@ export interface SeoInput {
   noFollow?: boolean;
   keywords?: string | null;
   structuredData?: JsonObject | null;
-  locale?: string | null;
+  locale?: string;
 }
 
 /**
