@@ -38,10 +38,27 @@ export interface SiteInfo {
 /**
  * SEO metadata resolved for the current locale.
  */
+export interface SeoImage {
+  url: string;
+  alt: string | null;
+  width: number | null;
+  height: number | null;
+  type: string | null;
+}
+
+/**
+ * SEO metadata resolved for the current locale.
+ */
 export interface Seo {
   metaTitle: string | null;
   metaDescription: string | null;
+  canonicalUrl: string | null;
+  ogUrl: string | null;
   ogType: string | null;
+  ogLocale: string;
+  ogImage: SeoImage | null;
+  articlePublishedTime: string | null;
+  articleModifiedTime: string | null;
   twitterCard: string;
   noIndex: boolean;
   noFollow: boolean;
@@ -161,6 +178,9 @@ export interface SeoInput {
   metaTitle?: string | null;
   metaDescription?: string | null;
   ogType?: string | null;
+  ogImageId?: string | null;
+  ogImageAlt?: string | null;
+  canonicalUrl?: string | null;
   twitterCard?: 'SUMMARY' | 'SUMMARY_LARGE_IMAGE';
   noIndex?: boolean;
   noFollow?: boolean;
