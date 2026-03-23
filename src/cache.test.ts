@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { MemoryCacheAdapter, cachedFetch } from './cache';
+import type { CacheAdapter } from './cache';
 
 describe('MemoryCacheAdapter', () => {
   it('returns undefined for unknown keys', () => {
@@ -78,9 +79,9 @@ describe('cachedFetch', () => {
 
   it('works with async cache adapters', async () => {
     const store = new Map<string, unknown>();
-    const asyncAdapter = {
-      get: (key: string) => Promise.resolve(store.get(key)),
-      set: (key: string, value: unknown) => {
+    const asyncAdapter: CacheAdapter<string> = {
+      get: (key: string) => Promise.resolve(store.get(key) as string | undefined),
+      set: (key: string, value: string) => {
         store.set(key, value);
         return Promise.resolve();
       },
@@ -90,5 +91,66 @@ describe('cachedFetch', () => {
     const result = await cachedFetch('key', () => Promise.reject(new Error('fail')), asyncAdapter);
 
     expect(result).toBe('value');
+  });
+
+  it('supports cache-first strategy with the options overload', async () => {
+    const adapter = new MemoryCacheAdapter();
+    adapter.set('doc', { title: 'Cached first' });
+    const fetcher = vi.fn().mockResolvedValue({ title: 'Fresh' });
+
+    const result = await cachedFetch({
+      key: 'doc',
+      fetcher,
+      adapter,
+      strategy: 'cache-first',
+    });
+
+    expect(result).toEqual({ title: 'Cached first' });
+    expect(fetcher).not.toHaveBeenCalled();
+  });
+
+  it('defaults the options overload to network-first', async () => {
+    const adapter = new MemoryCacheAdapter();
+    adapter.set('doc', { title: 'Cached first' });
+    const fetcher = vi.fn().mockResolvedValue({ title: 'Fresh again' });
+
+    const result = await cachedFetch({
+      key: 'doc',
+      fetcher,
+      adapter,
+    });
+
+    expect(result).toEqual({ title: 'Fresh again' });
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(adapter.get('doc')).toEqual({ title: 'Fresh again' });
+  });
+
+  it('fetches and caches on cache-first misses', async () => {
+    const adapter = new MemoryCacheAdapter();
+    const fetcher = vi.fn().mockResolvedValue({ title: 'Fresh' });
+
+    const result = await cachedFetch({
+      key: 'doc',
+      fetcher,
+      adapter,
+      strategy: 'cache-first',
+    });
+
+    expect(result).toEqual({ title: 'Fresh' });
+    expect(adapter.get('doc')).toEqual({ title: 'Fresh' });
+  });
+
+  it('rethrows cache-first failures when no cached value exists', async () => {
+    const adapter = new MemoryCacheAdapter();
+    const fetcher = vi.fn().mockRejectedValue(new Error('offline'));
+
+    await expect(
+      cachedFetch({
+        key: 'doc',
+        fetcher,
+        adapter,
+        strategy: 'cache-first',
+      }),
+    ).rejects.toThrow('offline');
   });
 });

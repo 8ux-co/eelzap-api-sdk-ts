@@ -8,6 +8,7 @@ describe('index exports', () => {
     expect(sdk.EelZapClient).toBeTypeOf('function');
     expect(sdk.EelZapError).toBeTypeOf('function');
     expect(sdk.EelZapNetworkError).toBeTypeOf('function');
+    expect(sdk.verifyWebhookSignature).toBeTypeOf('function');
     expect(sdk.ItemQueryBuilder).toBeTypeOf('function');
     expect(sdk.SiteResource).toBeTypeOf('function');
     expect(sdk.CollectionsResource).toBeTypeOf('function');
