@@ -23,6 +23,36 @@ function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
   return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
 }
 
+type SubtleCryptoLike = {
+  importKey: (
+    format: 'raw',
+    keyData: BufferSource,
+    algorithm: HmacImportParams,
+    extractable: boolean,
+    keyUsages: readonly KeyUsage[],
+  ) => Promise<CryptoKey>;
+  verify: (
+    algorithm: AlgorithmIdentifier,
+    key: CryptoKey,
+    signature: BufferSource,
+    data: BufferSource,
+  ) => Promise<boolean>;
+};
+
+async function getSubtleCrypto(): Promise<SubtleCryptoLike | null> {
+  const cryptoApi = Reflect.get(globalThis, 'crypto') as Crypto | undefined;
+  if (cryptoApi && 'subtle' in cryptoApi) {
+    return cryptoApi.subtle;
+  }
+
+  if (typeof process !== 'undefined') {
+    const { webcrypto } = await import('node:crypto');
+    return webcrypto.subtle as unknown as SubtleCryptoLike;
+  }
+
+  return null;
+}
+
 export async function verifyWebhookSignature(
   payload: string,
   signature: string,
@@ -37,8 +67,13 @@ export async function verifyWebhookSignature(
     return false;
   }
 
+  const subtle = await getSubtleCrypto();
+  if (!subtle) {
+    return false;
+  }
+
   const encoder = new TextEncoder();
-  const key = await globalThis.crypto.subtle.importKey(
+  const key = await subtle.importKey(
     'raw',
     encoder.encode(secret),
     { name: 'HMAC', hash: 'SHA-256' },
@@ -46,7 +81,7 @@ export async function verifyWebhookSignature(
     ['verify'],
   );
 
-  return globalThis.crypto.subtle.verify(
+  return subtle.verify(
     'HMAC',
     key,
     toArrayBuffer(signatureBytes),
