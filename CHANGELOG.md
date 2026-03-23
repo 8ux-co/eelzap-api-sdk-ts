@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.1] - 2026-03-23
+
+### Fixed
+
+- Restored webhook signature verification support in Node runtimes when `globalThis.crypto` is not pre-populated by the host environment.
+- Added fallback-path and malformed-signature test coverage for the webhook verification helper.
+
 ## [0.8.0] - 2026-03-23
 
 ### Added
