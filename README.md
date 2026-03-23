@@ -335,14 +335,24 @@ console.log(result.filesWritten);
 ## Resilience & Caching
 
 The SDK ships a `cachedFetch` helper and a `CacheAdapter` interface for
-**last-known-good caching** — no hardcoded fallback strings required.
+application-level content caching.
 
-On every successful fetch the result is persisted to your adapter. If a
-subsequent fetch fails (network error, timeout, 5xx), the last cached
-value is returned automatically. If nothing has ever been cached, the
-original error is re-thrown so your app can handle it explicitly.
+Two strategies are supported:
 
-### Quick example
+- `network-first` (default): always fetch fresh content, cache on success,
+  fall back to the last cached value on failure.
+- `cache-first`: return cached content immediately when present, only fetch
+  when the cache misses.
+
+This gives you two useful modes:
+
+- resilience-first delivery with `network-first`
+- speed-first delivery with `cache-first`
+
+If no cached value exists and the fetch fails, the original error is
+re-thrown so your app can handle it explicitly.
+
+### Quick examples
 
 ```ts
 import {
@@ -354,19 +364,51 @@ import {
 const cms = createClient({ apiKey: process.env.EELZAP_API_KEY! });
 const cache = new MemoryCacheAdapter();
 
-// First successful call populates the cache.
-// Subsequent failures transparently serve the last-known-good value.
+// Default strategy: network-first
 const homepage = await cachedFetch(
   'homepage',
   () => cms.documents.get('homepage'),
   cache,
 );
 
-const { data: posts } = await cachedFetch(
-  'blog:page-1',
-  () => cms.items.list('blog-posts', { pageSize: 10 }),
-  cache,
-);
+// Options overload: cache-first
+const posts = await cachedFetch({
+  key: 'blog:page-1',
+  adapter: cache,
+  strategy: 'cache-first',
+  fetcher: () => cms.items.list('blog-posts', { pageSize: 10 }),
+});
+```
+
+### `cachedFetch` behavior
+
+#### `network-first`
+
+1. Executes your `fetcher`
+2. Stores the fresh result in the adapter
+3. Returns the fresh result
+4. If the fetch fails, returns the last cached value when available
+
+#### `cache-first`
+
+1. Checks the adapter first
+2. Returns the cached value immediately on hit
+3. On miss, executes your `fetcher`
+4. Stores and returns the fresh result
+
+### API shapes
+
+```ts
+// Backwards-compatible positional API
+await cachedFetch('homepage', () => cms.documents.get('homepage'), cache);
+
+// Options API
+await cachedFetch({
+  key: 'homepage',
+  adapter: cache,
+  strategy: 'cache-first',
+  fetcher: () => cms.documents.get('homepage'),
+});
 ```
 
 ### Custom cache adapters
@@ -379,18 +421,18 @@ backend:
 import type { CacheAdapter } from '@8ux-co/eelzap-api-sdk-ts';
 
 // Example: filesystem adapter (Node.js)
-class FsCacheAdapter implements CacheAdapter {
+class FsCacheAdapter<T = unknown> implements CacheAdapter<T> {
   #dir: string;
   constructor(dir: string) { this.#dir = dir; }
 
-  async get<T>(key: string): Promise<T | undefined> {
+  async get(key: string): Promise<T | undefined> {
     try {
       const raw = await fs.readFile(path.join(this.#dir, `${key}.json`), 'utf8');
       return JSON.parse(raw) as T;
     } catch { return undefined; }
   }
 
-  async set<T>(key: string, value: T): Promise<void> {
+  async set(key: string, value: T): Promise<void> {
     await fs.mkdir(this.#dir, { recursive: true });
     await fs.writeFile(
       path.join(this.#dir, `${key}.json`),
@@ -424,6 +466,108 @@ burden. With `cachedFetch`, your site always serves real CMS content:
 - **Content never fetched:** the error propagates — you decide how to
   handle it (error page, skeleton, etc.) rather than showing stale
   placeholder text.
+
+## Webhooks
+
+When your CMS site is configured with a webhook URL and secret, EelZap
+can notify your application whenever content changes. This pairs well
+with `cache-first`: serve cached content fast, then invalidate keys when
+the CMS tells you something changed.
+
+The SDK includes:
+
+- `verifyWebhookSignature(payload, signature, secret)`
+- webhook payload types: `WebhookPayload`, `WebhookChange`,
+  `WebhookEventType`, `WebhookAction`
+
+### Signature verification
+
+EelZap signs webhook payloads with HMAC-SHA256 and sends the result in
+the `X-EelZap-Signature` header:
+
+```ts
+import { verifyWebhookSignature } from '@8ux-co/eelzap-api-sdk-ts';
+
+export async function POST(request: Request) {
+  const payload = await request.text();
+  const signature = request.headers.get('x-eelzap-signature') ?? '';
+
+  const isValid = await verifyWebhookSignature(
+    payload,
+    signature,
+    process.env.EELZAP_WEBHOOK_SECRET!,
+  );
+
+  if (!isValid) {
+    return new Response('Invalid signature', { status: 401 });
+  }
+
+  return new Response('ok');
+}
+```
+
+### Webhook payload shape
+
+```ts
+interface WebhookPayload {
+  event: 'content.changed';
+  site: { id: string; key: string };
+  changes: Array<{
+    type: 'item' | 'document' | 'media';
+    action: 'created' | 'updated' | 'deleted' | 'published' | 'unpublished';
+    resourceKey: string;
+    collectionKey?: string;
+  }>;
+  timestamp: string;
+}
+```
+
+### Cache invalidation example
+
+```ts
+import {
+  MemoryCacheAdapter,
+  type WebhookPayload,
+  verifyWebhookSignature,
+} from '@8ux-co/eelzap-api-sdk-ts';
+
+const cache = new MemoryCacheAdapter();
+
+export async function POST(request: Request) {
+  const payload = await request.text();
+  const signature = request.headers.get('x-eelzap-signature') ?? '';
+
+  const isValid = await verifyWebhookSignature(
+    payload,
+    signature,
+    process.env.EELZAP_WEBHOOK_SECRET!,
+  );
+
+  if (!isValid) {
+    return new Response('Invalid signature', { status: 401 });
+  }
+
+  const body = JSON.parse(payload) as WebhookPayload;
+
+  for (const change of body.changes) {
+    if (change.type === 'document') {
+      cache.delete(change.resourceKey);
+    }
+  }
+
+  return new Response('ok');
+}
+```
+
+### Recommended pattern
+
+1. Use `cachedFetch(..., cache)` with `network-first` when you want
+   automatic stale fallback on outages.
+2. Use `cachedFetch({ strategy: 'cache-first', ... })` when you want
+   instant cached reads.
+3. Configure a CMS webhook endpoint in your app.
+4. Verify `X-EelZap-Signature` with `verifyWebhookSignature`.
+5. Invalidate the affected cache keys from `body.changes`.
 
 ## Error Handling
 

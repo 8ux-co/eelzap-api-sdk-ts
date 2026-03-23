@@ -1,5 +1,5 @@
 export { cachedFetch, MemoryCacheAdapter } from './cache';
-export type { CacheAdapter } from './cache';
+export type { CacheAdapter, CachedFetchOptions, CacheStrategy } from './cache';
 export { createClient, EelZapClient } from './client';
 export type { ClientConfig } from './client';
 export { EelZapError, EelZapNetworkError, isEelZapError } from './errors';
@@ -16,4 +16,5 @@ export { ItemSeoResource } from './resources/item-seo';
 export { MediaResource } from './resources/media';
 export { ItemsResource } from './resources/items';
 export { SiteResource } from './resources/site';
+export { verifyWebhookSignature } from './webhook';
 export * from './types';

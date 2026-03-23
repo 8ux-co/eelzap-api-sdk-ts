@@ -5,9 +5,18 @@
  * filesystem, IndexedDB, etc.). The SDK ships a built-in
  * {@link MemoryCacheAdapter} for processes that stay alive.
  */
-export interface CacheAdapter {
-  get(key: string): unknown;
-  set(key: string, value: unknown): Promise<void> | void;
+export interface CacheAdapter<T = unknown> {
+  get(key: string): Promise<T | undefined> | T | undefined;
+  set(key: string, value: T): Promise<void> | void;
+}
+
+export type CacheStrategy = 'network-first' | 'cache-first';
+
+export interface CachedFetchOptions<T = unknown> {
+  key: string;
+  fetcher: () => Promise<T>;
+  adapter: CacheAdapter<T>;
+  strategy?: CacheStrategy;
 }
 
 /**
@@ -65,14 +74,44 @@ export class MemoryCacheAdapter implements CacheAdapter {
 export async function cachedFetch<T>(
   key: string,
   fetcher: () => Promise<T>,
-  adapter: CacheAdapter,
+  adapter: CacheAdapter<T>,
+): Promise<T>;
+export async function cachedFetch<T>(options: CachedFetchOptions<T>): Promise<T>;
+export async function cachedFetch<T>(
+  keyOrOptions: string | CachedFetchOptions<T>,
+  fetcher?: () => Promise<T>,
+  adapter?: CacheAdapter<T>,
 ): Promise<T> {
+  const options =
+    typeof keyOrOptions === 'string'
+      ? {
+          key: keyOrOptions,
+          fetcher: fetcher as () => Promise<T>,
+          adapter: adapter as CacheAdapter<T>,
+          strategy: 'network-first' as CacheStrategy,
+        }
+      : {
+          ...keyOrOptions,
+          strategy: keyOrOptions.strategy ?? 'network-first',
+        };
+
+  if (options.strategy === 'cache-first') {
+    const cached = await options.adapter.get(options.key);
+    if (cached !== undefined) {
+      return cached;
+    }
+
+    const result = await options.fetcher();
+    await options.adapter.set(options.key, result);
+    return result;
+  }
+
   try {
-    const result = await fetcher();
-    await adapter.set(key, result);
+    const result = await options.fetcher();
+    await options.adapter.set(options.key, result);
     return result;
   } catch (error) {
-    const cached = (await adapter.get(key)) as T | undefined;
+    const cached = await options.adapter.get(options.key);
     if (cached !== undefined) {
       return cached;
     }
