@@ -34,7 +34,7 @@ describe('mapFieldBaseType', () => {
     expect(mapFieldBaseType(createField(type))).toBe(expected);
   });
 
-  it('builds literal unions for enum fields', () => {
+  it('builds narrowed EnumValue for enum fields with options', () => {
     expect(
       mapFieldBaseType(
         createField('ENUM', {
@@ -44,11 +44,11 @@ describe('mapFieldBaseType', () => {
           ],
         }),
       ),
-    ).toBe('"draft" | "published"');
+    ).toBe('EnumValue & { value: "draft" | "published" }');
   });
 
-  it('falls back to string for enums without options', () => {
-    expect(mapFieldBaseType(createField('ENUM'))).toBe('string');
+  it('falls back to EnumValue for enums without options', () => {
+    expect(mapFieldBaseType(createField('ENUM'))).toBe('EnumValue');
   });
 
   it('falls back to unknown for unsupported field types', () => {

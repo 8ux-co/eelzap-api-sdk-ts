@@ -9,7 +9,7 @@ export const FIELD_TYPE_MAP: Record<FieldType, string> = {
   BOOLEAN: 'boolean',
   DATE: 'string',
   DATETIME: 'string',
-  ENUM: 'string',
+  ENUM: 'EnumValue',
   CURRENCY: 'CurrencyValue',
   GALLERY: 'GalleryItemValue[]',
   IMAGE: 'MediaValue',
@@ -37,21 +37,23 @@ export function mapFieldBaseType(field: FieldInfo): string {
 }
 
 export function fieldUsesSdkType(field: FieldInfo): field is FieldInfo & {
-  type: 'IMAGE' | 'VIDEO' | 'FILE' | 'CURRENCY' | 'GALLERY';
+  type: 'IMAGE' | 'VIDEO' | 'FILE' | 'CURRENCY' | 'GALLERY' | 'ENUM';
 } {
   return (
     field.type === 'IMAGE' ||
     field.type === 'VIDEO' ||
     field.type === 'FILE' ||
     field.type === 'CURRENCY' ||
-    field.type === 'GALLERY'
+    field.type === 'GALLERY' ||
+    field.type === 'ENUM'
   );
 }
 
 export function mapEnumFieldType(field: Pick<FieldInfo, 'options'>): string {
   if (!field.options || field.options.length === 0) {
-    return 'string';
+    return 'EnumValue';
   }
 
-  return field.options.map((option) => JSON.stringify(option.value)).join(' | ');
+  const valueUnion = field.options.map((option) => JSON.stringify(option.value)).join(' | ');
+  return `EnumValue & { value: ${valueUnion} }`;
 }

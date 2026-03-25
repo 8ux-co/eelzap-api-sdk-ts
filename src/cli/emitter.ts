@@ -259,6 +259,7 @@ function collectSdkImports(entity: EntitySchema, options: EmitterOptions): strin
     FILE: 'MediaValue',
     CURRENCY: 'CurrencyValue',
     GALLERY: 'GalleryItemValue',
+    ENUM: 'EnumValue',
   } as const;
 
   for (const field of entity.fields) {

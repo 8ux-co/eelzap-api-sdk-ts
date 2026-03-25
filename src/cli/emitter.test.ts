@@ -50,7 +50,7 @@ describe('emitEntityFile', () => {
 
     expect(file.path).toBe('collections/blog-posts.ts');
     expect(file.content).toContain('export interface BlogPostsContent');
-    expect(file.content).toContain('"status": "draft" | "live" | null;');
+    expect(file.content).toContain('"status": EnumValue & { value: "draft" | "live" } | null;');
     expect(file.content).toContain('Hero image | IMAGE');
     expect(file.content).toContain(
       'export type BlogPostsItem = ItemDetail<BlogPostsContent> & { meta: ItemMeta; } & { seo: Seo | null; };',
