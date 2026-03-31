@@ -1,6 +1,8 @@
 import { HttpClient } from './http';
 import { CollectionsResource } from './resources/collections';
+import { DocumentVersionsResource } from './resources/document-versions';
 import { DocumentsResource } from './resources/documents';
+import { ItemVersionsResource } from './resources/item-versions';
 import { ItemsResource } from './resources/items';
 import { MediaResource } from './resources/media';
 import { SiteResource } from './resources/site';
@@ -27,6 +29,8 @@ export class EelZapClient {
   readonly items: ItemsResource;
   readonly documents: DocumentsResource;
   readonly media: MediaResource;
+  readonly itemVersions: ItemVersionsResource;
+  readonly documentVersions: DocumentVersionsResource;
   readonly #http: HttpClient;
   readonly #defaults: ClientDefaults;
   readonly #config: Required<Pick<ClientConfig, 'apiKey' | 'baseUrl' | 'pathPrefix' | 'timeout'>> &
@@ -69,6 +73,8 @@ export class EelZapClient {
     this.items = new ItemsResource(this.#http, this.#defaults);
     this.documents = new DocumentsResource(this.#http, this.#defaults);
     this.media = new MediaResource(this.#http);
+    this.itemVersions = new ItemVersionsResource(this.#http);
+    this.documentVersions = new DocumentVersionsResource(this.#http);
   }
 
   /**

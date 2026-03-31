@@ -151,6 +151,45 @@ const media = await cms.media.upload({
 await cms.media.publish(media.id);
 ```
 
+### Content Versioning
+
+The SDK supports the full draft workflow — create drafts, update them, preview, and publish when ready.
+
+```ts
+// Create a draft from the current published version
+const draft = await cms.itemVersions.createDraft('blog', 'hello-world', {
+  note: 'Update hero image',
+});
+
+// Update the draft with new values
+await cms.itemVersions.updateDraft('blog', 'hello-world', {
+  values: { hero_image: 'new-image-id' },
+  locale: 'en',
+});
+
+// Publish when ready
+await cms.itemVersions.publishDraft('blog', 'hello-world');
+
+// Or discard if not needed
+await cms.itemVersions.discardDraft('blog', 'hello-world');
+
+// List version history
+const { versions } = await cms.itemVersions.list('blog', 'hello-world');
+
+// Rollback to a previous version (creates a new draft)
+await cms.itemVersions.rollback('blog', 'hello-world', versions[2].id);
+```
+
+Document versioning works the same way:
+
+```ts
+await cms.documentVersions.createDraft('homepage');
+await cms.documentVersions.updateDraft('homepage', {
+  values: { title: 'Welcome' },
+});
+await cms.documentVersions.publishDraft('homepage');
+```
+
 ### Rich Text And Media Helpers
 
 ```ts

@@ -4,4 +4,5 @@ export * from './documents';
 export * from './errors';
 export * from './items';
 export * from './media';
+export * from './versions';
 export * from './webhook';
