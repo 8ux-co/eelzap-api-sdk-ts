@@ -1,5 +1,9 @@
 # @8ux-co/eelzap-api-sdk-ts
 
+> **This package is replaced by [`@8ux-co/eelzap`](https://www.npmjs.com/package/@8ux-co/eelzap).**
+> 0.9.1 is its last release. Install `@8ux-co/eelzap` for the client, and
+> `@8ux-co/eelzap-cli` (a devDependency, `npx eelzap codegen`) for generated types.
+
 [![npm version](https://img.shields.io/npm/v/%408ux-co%2Feelzap-api-sdk-ts)](https://www.npmjs.com/package/@8ux-co/eelzap-api-sdk-ts)
 [![CI](https://img.shields.io/github/actions/workflow/status/8ux-co/eelzap-api-sdk-ts/ci.yml?branch=main&label=ci)](https://github.com/8ux-co/eelzap-api-sdk-ts/actions/workflows/ci.yml)
 [![license](https://img.shields.io/npm/l/%408ux-co%2Feelzap-api-sdk-ts)](https://github.com/8ux-co/eelzap-api-sdk-ts/blob/main/LICENSE)
